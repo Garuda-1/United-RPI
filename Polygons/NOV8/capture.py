@@ -33,8 +33,15 @@ with picamera.PiCamera() as camera:
     ])
 
     capture_out = test_transforms(Image.fromarray(source))
+    capture_out = capture_out[0]
+    capture_out /= capture_out.max()
+    capture_out *= 255
 
+    data = np.zeros((capture_out.shape[0], capture_out.shape[1], 3), dtype=np.uint8)
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            t = capture_out[i, j]
+            data[i, j] = [t, t, t]
 
-    img = Image.fromarray(capture_out[0].numpy())
-    # img = img.convert('L')
-    img.save('capture_out.png')
+    img = Image.fromarray(data, 'RGB')
+    img.save('capture_data.png')

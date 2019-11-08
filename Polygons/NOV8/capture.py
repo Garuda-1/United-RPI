@@ -1,9 +1,12 @@
 import time
 import picamera
 import numpy as np
-import torch 
-
-
+import torch
+from torchvision import transforms
+from PIL import Image
+from skimage.feature import hog
+from PIL import ImageEnhance
+from PIL import ImageFilter
 
 with picamera.PiCamera() as camera:
     w = 512
@@ -21,13 +24,17 @@ with picamera.PiCamera() as camera:
 
     camera.stop_preview()
 
-    source = Image.fromarray(source, 'RGB') 
+    source = Image.fromarray(source, 'RGB')
     source = transforms.Resize((w,h))(source)
     fd, source = hog(source, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=True, multichannel=True)
     test_transforms = transforms.Compose([
-        transforms.Resize((256, 256))
+        transforms.Resize((256, 256)),
         transforms.ToTensor()
     ])
 
     capture_out = test_transforms(Image.fromarray(source))
 
+
+    img = Image.fromarray(capture_out[0].numpy())
+    # img = img.convert('L')
+    img.save('capture_out.png')
